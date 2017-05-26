@@ -1,4 +1,4 @@
-# Parallel Words Count
+# MPI Parallel Words Count
 
 Academic Project for the course: Parallel and Concurrent Programming on the Cloud.
 
