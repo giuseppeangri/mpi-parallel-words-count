@@ -1,0 +1,13 @@
+
+Installing instructions
+============================
+
+No installing is necessary to use the template, 
+but programs created with this template need instructions below:
+
+Navigate to src directory and call make.
+
+% cd src/
+% make
+
+Additionally you can modify Makefile and add more actions for make - e.g. "make install"
