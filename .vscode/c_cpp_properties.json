@@ -1,0 +1,15 @@
+{
+    "configurations": [
+        {
+            "name": "macOS",
+            "includePath": [
+                "/usr/local/include/*",
+                "${workspaceRoot}",
+                "${workspaceRoot}/include",
+                "${workspaceRoot}/lib"
+            ],
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 3
+}
