@@ -1,3 +1,1 @@
-extern FILE * 	openFile(char * filePath, char * mode);
-extern char * 	readLine(FILE * file);
-extern char **	readAllLines(FILE * file);
+extern void startRead(int my_rank, double split_size, FileInformationContainer filesContainer, CounterContainer entriesContainer, FILE * log_file);
