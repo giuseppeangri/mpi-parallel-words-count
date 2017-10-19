@@ -1,8 +1,8 @@
 typedef struct FileInformationContainer {
 
-	FileInformation ** files;
-	int num_files;
-	double total_size;
+	FileInformation ** 	files;
+	int 				num_files;
+	double 				total_size;
 
 } FileInformationContainer;
 

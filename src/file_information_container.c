@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <stdlib.h>
+
 #include <file_information.h>
 #include <file_information_container.h>
 

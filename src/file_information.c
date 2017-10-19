@@ -1,6 +1,6 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+
 #include <file_information.h>
 
 FileInformation * FileInformation_constructor(char * path) {
