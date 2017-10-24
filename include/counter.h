@@ -1,8 +1,9 @@
 typedef struct Counter {
 
-	char *	word;
-	int		count;
-
+    size_t  length;
+    char *  word;
+    int     count;
+    
 } Counter;
 
-extern Counter * Counter_constructor(char * word);
+extern Counter * Counter_constructor(char * word, int count);
