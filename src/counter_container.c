@@ -9,14 +9,27 @@ CounterContainer CounterContainer_constructor() {
 
 	CounterContainer entriesContainer;
 
-	entriesContainer.entries = (Counter **) malloc(sizeof(Counter *));
 	entriesContainer.size 	 = 0;
+	entriesContainer.entries = (Counter **) malloc(sizeof(Counter *));
 
 	return entriesContainer;
 
 }
 
-int CounterContainer_IndexOfWord(CounterContainer * entriesContainer, char * word) {
+int CounterContainer_addEntry(CounterContainer * entriesContainer, Counter * entry) {
+
+	int index = entriesContainer->size;
+
+	entriesContainer->size++;
+	entriesContainer->entries = (Counter **) realloc(entriesContainer->entries, sizeof(Counter *) * entriesContainer->size);
+
+	entriesContainer->entries[index] = entry;
+
+	return index;
+
+}
+
+int CounterContainer_indexOfWord(CounterContainer * entriesContainer, char * word) {
 
 	int size = entriesContainer->size;
 
@@ -34,43 +47,36 @@ int CounterContainer_IndexOfWord(CounterContainer * entriesContainer, char * wor
 
 }
 
-int CounterContainer_addEntry(CounterContainer * entriesContainer, Counter * entry) {
+int CounterContainer_findAndAddEntry(CounterContainer * entriesContainer, Counter * entry) {
 
-	int index = entriesContainer->size;
+    int foundIndex = CounterContainer_indexOfWord(entriesContainer, entry->word);
 
-	entriesContainer->size++;
-	entriesContainer->entries = (Counter **) realloc(entriesContainer->entries, sizeof(Counter *) * entriesContainer->size);
+    if(foundIndex == -1) {
 
-	entriesContainer->entries[index] = entry;
+        // Word Not Found
 
-	return index;
+        int addedIndex = CounterContainer_addEntry(entriesContainer, entry);
+
+        return 	addedIndex;
+
+    }
+    else {
+
+        // Word Found
+
+        entriesContainer->entries[foundIndex]->count += entry->count;
+
+        return foundIndex;
+
+    }
 
 }
 
-int CounterContainer_addWord(CounterContainer * entriesContainer, char * word) {
+int CounterContainer_findAndAddWord(CounterContainer * entriesContainer, char * word, int count) {
 
-	int foundIndex = CounterContainer_IndexOfWord(entriesContainer, word);
+    Counter * entry = Counter_constructor(word, count);
 
-	if(foundIndex == -1) {
-
-		// Word Not Found
-
-		Counter * entry = Counter_constructor(word);
-
-		int addedIndex = CounterContainer_addEntry(entriesContainer, entry);
-
-		return 	addedIndex;
-
-	}
-	else {
-
-		// Word Found
-
-		entriesContainer->entries[foundIndex]->count++;
-
-		return foundIndex;
-
-	}
+    return CounterContainer_findAndAddEntry(entriesContainer, entry);
 
 }
 
