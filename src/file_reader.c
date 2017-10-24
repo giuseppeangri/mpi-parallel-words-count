@@ -101,7 +101,7 @@ void startRead(int my_rank, double split_size, FileInformationContainer filesCon
 				// So i read a whole word
 
 				// MPI_Print_To_File(log_file, my_rank, "Word readed: %s", current_word);
-				CounterContainer_addWord(&entriesContainer, current_word);
+				CounterContainer_findAndAddWord(&entriesContainer, current_word, 1);
 				word_founded++;
 
 				// Clear current word and reset current word index
@@ -142,7 +142,7 @@ void startRead(int my_rank, double split_size, FileInformationContainer filesCon
 				// So i read a whole word
 
 				// MPI_Print_To_File(log_file, my_rank, "Word readed: %s", current_word);
-				CounterContainer_addWord(&entriesContainer, current_word);
+				CounterContainer_findAndAddWord(&entriesContainer, current_word, 1);
 				word_founded++;
 
 				// Clear current word and reset current word index
@@ -174,7 +174,7 @@ void startRead(int my_rank, double split_size, FileInformationContainer filesCon
 			// So i read a whole word
 
 			// MPI_Print_To_File(log_file, my_rank, "Final Word readed: %s", current_word);
-			CounterContainer_addWord(&entriesContainer, current_word);
+			CounterContainer_findAndAddWord(&entriesContainer, current_word, 1);
 			word_founded++;
 
 			// Clear current word and reset current word index
