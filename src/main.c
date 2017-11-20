@@ -67,7 +67,7 @@ int main(int argc, char * argv[]) {
 		MPI_Print_To_File(log_file, my_rank, "Number of files: %d", filesContainer.num_files);
 		MPI_Print_To_File(log_file, my_rank, "Total size of files: %.2f bytes", filesContainer.total_size);
 		MPI_Print_To_File(log_file, my_rank, "Single split size: %f bytes\n\n", split_size);
-
+		
 		MPI_Print(my_rank, "Number of files: %d", filesContainer.num_files);
 		MPI_Print(my_rank, "Total size of files: %.2f bytes", filesContainer.total_size);
 		MPI_Print(my_rank, "Single split size: %f bytes\n\n", split_size);
@@ -91,14 +91,16 @@ int main(int argc, char * argv[]) {
 
 	// exit(0);
 
-	startRead(my_rank, split_size, filesContainer, entriesContainer, log_file);
+	startReader(my_rank, split_size, &filesContainer, &entriesContainer, log_file);
 
     int rec = 1;
     int rv[10];
     MPI_Gather(&rec, 1, MPI_INT, &rv, 1, MPI_INT, master_rank, MPI_COMM_WORLD);
 
-    if(my_rank == master_rank)
-    	MPI_Print_To_File(log_file, my_rank, "END");
+    if(my_rank == master_rank) {
+		CounterContainer_print(&entriesContainer);
+		MPI_Print_To_File(log_file, my_rank, "END");
+	}
 
     fclose(log_file);
 

@@ -1,1 +1,1 @@
-extern void startRead(int my_rank, double split_size, FileInformationContainer filesContainer, CounterContainer entriesContainer, FILE * log_file);
+extern void startReader(int my_rank, double split_size, FileInformationContainer * filesContainer, CounterContainer * entriesContainer, FILE * log_file);
