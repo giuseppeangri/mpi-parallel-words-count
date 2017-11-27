@@ -10,6 +10,7 @@
 
 #include <counter.h>
 #include <counter_container.h>
+#include <counter_container_mpi.h>
 
 #include <file_reader.h>
 
@@ -75,32 +76,58 @@ int main(int argc, char * argv[]) {
 
 	entriesContainer = CounterContainer_constructor();
 
-	// CounterContainer_print(&entriesContainer);
-
-	// CounterContainer_addWord(&entriesContainer, "Lorem");
-
-	// CounterContainer_print(&entriesContainer);
-
-	// CounterContainer_addWord(&entriesContainer, "ipsum");
-
-	// CounterContainer_print(&entriesContainer);
-
-	// CounterContainer_addWord(&entriesContainer, "ipsum");
-
-	// CounterContainer_print(&entriesContainer);
-
-	// exit(0);
-
 	startReader(my_rank, split_size, &filesContainer, &entriesContainer, log_file);
 
-    int rec = 1;
-    int rv[10];
-    MPI_Gather(&rec, 1, MPI_INT, &rv, 1, MPI_INT, master_rank, MPI_COMM_WORLD);
+	// Calculate Send Pack Size
+
+    int sendPackSize = 0;
+
+    if(my_rank != master_rank) {
+		sendPackSize = CounterContainer_calculateSendPackSize(&entriesContainer);
+	}
+
+	printf("Rank: %d - SEND PACK SIZE: %d\n", my_rank, sendPackSize);
+
+    // Gather Send Pack Size
+
+    int packsSizes[num_processes];
+
+	MPI_Gather(&sendPackSize, 1, MPI_INT, packsSizes, 1, MPI_INT, master_rank, MPI_COMM_WORLD);
+
+	// Prepare Recv Pack Buffer and Displacements
+
+	int     recvBufferSize;
+	void *  recvBuffer = NULL;
+	int 	displacements[num_processes];
+
+	if(my_rank == master_rank) {
+		recvBufferSize = CounterContainer_calculateRecvPacksBufferSize(num_processes, master_rank, packsSizes);
+		recvBuffer = malloc(recvBufferSize);
+		CounterContainer_calculateDisplacements(num_processes, master_rank, packsSizes, displacements);
+	}
+
+	// Make Send Pack Buffer
+
+	void * packedBuffer;
+
+	if(my_rank != master_rank) {
+		packedBuffer = CounterContainer_makeSendPackBuffer(&entriesContainer, sendPackSize);
+	}
+
+	// Gather Send Pack
+
+    printf("R: %d - sendCount:  %d\n", my_rank, sendPackSize);
+
+    MPI_Gatherv(packedBuffer, sendPackSize, MPI_PACKED, 
+        recvBuffer, packsSizes, displacements, MPI_PACKED, 
+        master_rank, MPI_COMM_WORLD);
+
+    // Merge all packs
 
     if(my_rank == master_rank) {
-		CounterContainer_print(&entriesContainer);
-		MPI_Print_To_File(log_file, my_rank, "END");
-	}
+        CounterContainer_merge(&entriesContainer, recvBuffer, recvBufferSize, num_processes-1);
+        CounterContainer_print(&entriesContainer);
+    }
 
     fclose(log_file);
 
