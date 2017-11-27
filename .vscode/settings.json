@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "file_information_container.h": "c",
+        "counter_container.h": "c"
+    }
+}
