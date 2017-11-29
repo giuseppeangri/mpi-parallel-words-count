@@ -14,21 +14,13 @@
 
 #include <file_reader.h>
 
-FileInformationContainer makeContainer(char * masterFilePath);
-
 int main(int argc, char * argv[]) {
 
-// MPI VARIABLES
-
-	int master_rank;
-	int my_rank;
-	int source_rank;
-	int dest_rank;
-	int num_processes;
-
-	MPI_Status 	mpi_status;
-
 // MPI INIZIALIZE
+
+	int my_rank;
+	int master_rank;
+	int num_processes;
 
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
@@ -36,57 +28,47 @@ int main(int argc, char * argv[]) {
 	
 	master_rank = 0;
 
-// OTHER VARIABLES
-
-	FILE * log_file;
-	char * log_file_name;
-
-	FileInformationContainer filesContainer;
-
-	CounterContainer entriesContainer;
-
-	double split_size;
-
 // MAIN
 
 	// Log File
-	asprintf(&log_file_name, "../logs/log_%02d.txt", my_rank);
+	char * log_file_name;
+	FILE * log_file;
 
+	asprintf(&log_file_name, "../logs/log_%02d.txt", my_rank);
 	log_file = openFile(log_file_name, "w");
 
 	// Welcome message
-	MPI_Print_To_File(log_file, my_rank, "MPI Words Count Collective - Giuseppe Angri");
+	fprintf(log_file, "MPI Words Count Collective - Giuseppe Angri\n");
+	(my_rank == master_rank) ? fprintf(log_file, "Rank %d (MASTER)\n\n", my_rank) : fprintf(log_file, "Rank %d\n\n", my_rank);
+
+	printf("MPI Words Count Collective - Giuseppe Angri\n");
+	(my_rank == master_rank) ? printf("Rank %d (MASTER)\n\n", my_rank) : printf("Rank %d\n\n", my_rank);
 
 	// Get information about all files to read
-	filesContainer = makeContainer(argv[1] ? argv[1] : "../data/00_master.txt");
+	FileInformationContainer filesContainer = FileInformationContainer_buildByMasterFile(argv[1] ? argv[1] : "../data/00_master.txt");
 
 	// Calculate split size that each process will have to read
-	// split_size = round( (filesContainer.total_size / num_processes)*10 ) / 10;
-	split_size = (int) (filesContainer.total_size / num_processes);
+	double split_size = (int) (filesContainer.total_size / num_processes);
 
 	if(my_rank == master_rank) {
-		MPI_Print_To_File(log_file, my_rank, "Number of files: %d", filesContainer.num_files);
-		MPI_Print_To_File(log_file, my_rank, "Total size of files: %.2f bytes", filesContainer.total_size);
-		MPI_Print_To_File(log_file, my_rank, "Single split size: %f bytes\n\n", split_size);
-		
-		MPI_Print(my_rank, "Number of files: %d", filesContainer.num_files);
-		MPI_Print(my_rank, "Total size of files: %.2f bytes", filesContainer.total_size);
-		MPI_Print(my_rank, "Single split size: %f bytes\n\n", split_size);
+		fprintf(log_file, "Number of files: %d\n", filesContainer.num_files);
+		fprintf(log_file, "Total size of files: %.2f bytes\n", filesContainer.total_size);
+		fprintf(log_file, "Single split size: %f bytes\n\n", split_size);
 	}
 
-	entriesContainer = CounterContainer_constructor();
+	// Words Count Process
+
+	CounterContainer entriesContainer = CounterContainer_constructor();
 
 	startReader(my_rank, split_size, &filesContainer, &entriesContainer, log_file);
 
 	// Calculate Send Pack Size
 
-    int sendPackSize = 0;
+	int sendPackSize = 0;
 
     if(my_rank != master_rank) {
 		sendPackSize = CounterContainer_calculateSendPackSize(&entriesContainer);
 	}
-
-	printf("Rank: %d - SEND PACK SIZE: %d\n", my_rank, sendPackSize);
 
     // Gather Send Pack Size
 
@@ -94,7 +76,7 @@ int main(int argc, char * argv[]) {
 
 	MPI_Gather(&sendPackSize, 1, MPI_INT, packsSizes, 1, MPI_INT, master_rank, MPI_COMM_WORLD);
 
-	// Prepare Recv Pack Buffer and Displacements
+	// Allocate Recv Pack Buffer and Calculate Displacements
 
 	int     recvBufferSize;
 	void *  recvBuffer = NULL;
@@ -116,8 +98,6 @@ int main(int argc, char * argv[]) {
 
 	// Gather Send Pack
 
-    printf("R: %d - sendCount:  %d\n", my_rank, sendPackSize);
-
     MPI_Gatherv(packedBuffer, sendPackSize, MPI_PACKED, 
         recvBuffer, packsSizes, displacements, MPI_PACKED, 
         master_rank, MPI_COMM_WORLD);
@@ -126,6 +106,11 @@ int main(int argc, char * argv[]) {
 
     if(my_rank == master_rank) {
         CounterContainer_merge(&entriesContainer, recvBuffer, recvBufferSize, num_processes-1);
+
+		fprintf(log_file, "\nGlobal Histogram\n\n");
+		CounterContainer_printToFile(&entriesContainer, log_file);
+
+		printf("Global Histogram\n\n");
         CounterContainer_print(&entriesContainer);
     }
 
@@ -135,26 +120,5 @@ int main(int argc, char * argv[]) {
 	
 	MPI_Finalize(); 	
 	exit(EXIT_SUCCESS);
-
-}
-
-FileInformationContainer makeContainer(char * masterFilePath) {
-
-	FILE * masterFile = fopen(masterFilePath, "r");
-
-	FileInformationContainer filesContainer = FileInformationContainer_constructor();
-
-    char **pathList = readAllLines(masterFile);
-
-    char **singlePath = pathList;
-
-    while(*singlePath != NULL) {
-    	FileInformationContainer_addByPath(&filesContainer, *singlePath);
-    	++singlePath;
-    }
-
-    fclose(masterFile);
-
-	return filesContainer;
 
 }
