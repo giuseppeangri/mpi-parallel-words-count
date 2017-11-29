@@ -33,13 +33,10 @@ int CounterContainer_calculateRecvPacksBufferSize(int num_processes, int master_
     int recvBufferSize = 0;
 
     for(int i=0; i<num_processes; i++) {
-        printf("rank: %d - size: %d\n", i, packsSizes[i]);
         if(i != master_rank) {
             recvBufferSize += packsSizes[i];
         }
     }
-
-    printf("recvBufferSize: %d\n", recvBufferSize);
 
     return recvBufferSize;
 
@@ -50,12 +47,8 @@ void CounterContainer_calculateDisplacements(int num_processes, int master_rank,
     int alreadyDisplaced = 0;
         
     for(int i=0; i<num_processes; i++) {
-
         displacements[i]  = alreadyDisplaced;
         alreadyDisplaced += (i == master_rank) ? 0 : packsSizes[i];
-
-        printf("displacements %d: %d\n", i, displacements[i]);
-
     }
 
 }
@@ -87,8 +80,6 @@ void CounterContainer_merge(CounterContainer * entriesContainer, void * recvBuff
 
         MPI_Unpack(recvBuffer, recvBufferSize, &position, &recvCountersSize, 1, MPI_INT, MPI_COMM_WORLD);
 
-        printf("Container: %d - recvCountersSize:  %d\n", i, recvCountersSize);
-
         for(int j=0; j<recvCountersSize; j++) {
 
             Counter * entry = malloc(sizeof(Counter));
@@ -100,8 +91,6 @@ void CounterContainer_merge(CounterContainer * entriesContainer, void * recvBuff
             MPI_Unpack(recvBuffer, recvBufferSize, &position, entry->word, entry->length, MPI_CHAR, MPI_COMM_WORLD);
     
             MPI_Unpack(recvBuffer, recvBufferSize, &position, &entry->count, 1, MPI_INT, MPI_COMM_WORLD);
-
-            printf("entry: %d - len: %lu - word: %s - count: %d\n", j, entry->length, entry->word, entry->count);
             
             CounterContainer_findAndAddEntry(entriesContainer, entry);
 
