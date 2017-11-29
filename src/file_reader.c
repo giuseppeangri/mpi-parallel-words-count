@@ -176,8 +176,7 @@ void startReader(int my_rank, double split_size, FileInformationContainer * file
 
     // MPI_Print(my_rank, "end %c", current_char);
 
-    MPI_Print_To_File(log_file, my_rank, "I read this size: %f", already_read_by_me);
-    // MPI_Print(my_rank, "I read this size: %f", already_read_by_me);
+    
 
     current_char = fgetc(file_to_read);
 
@@ -197,10 +196,14 @@ void startReader(int my_rank, double split_size, FileInformationContainer * file
 
     }
 
-    MPI_Print_To_File(log_file, my_rank, "Words Found: %d", words_found);
+	fprintf(log_file, "Size Readed: %f bytes\n", already_read_by_me);
+    // MPI_Print(my_rank, "I read this size: %f", already_read_by_me);
+
+    fprintf(log_file, "Words Found: %d\n\n", words_found);
     // MPI_Print(my_rank, "Words Found: %d", words _found);
 
     // CounterContainer_print(&entriesContainer);
+    fprintf(log_file, "Local Histogram\n\n");
     CounterContainer_printToFile(entriesContainer, log_file);
 
     fclose(file_to_read);
