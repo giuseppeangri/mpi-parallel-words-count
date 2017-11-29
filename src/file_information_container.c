@@ -1,4 +1,7 @@
+#include <stdio.h>
 #include <stdlib.h>
+
+#include <file_utils.h>
 
 #include <file_information.h>
 #include <file_information_container.h>
@@ -31,5 +34,26 @@ void FileInformationContainer_addByPath(FileInformationContainer * fileInformati
 	FileInformation * fileInformation = FileInformation_constructor(filePath);
 
 	FileInformationContainer_add(fileInformationContainer, fileInformation);
+
+}
+
+FileInformationContainer FileInformationContainer_buildByMasterFile(char * masterFilePath) {
+
+	FILE * masterFile = fopen(masterFilePath, "r");
+
+	FileInformationContainer filesContainer = FileInformationContainer_constructor();
+
+    char **pathList = readAllLines(masterFile);
+
+    char **singlePath = pathList;
+
+    while(*singlePath != NULL) {
+    	FileInformationContainer_addByPath(&filesContainer, *singlePath);
+    	++singlePath;
+    }
+
+    fclose(masterFile);
+
+	return filesContainer;
 
 }
