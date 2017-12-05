@@ -21,12 +21,14 @@ int main(int argc, char * argv[]) {
 	int my_rank;
 	int master_rank;
 	int num_processes;
+	double timeStart, timeEnd;
 
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 	MPI_Comm_size(MPI_COMM_WORLD, &num_processes);
 	
 	master_rank = 0;
+	timeStart = MPI_Wtime();
 
 // MAIN
 
@@ -117,6 +119,9 @@ int main(int argc, char * argv[]) {
     fclose(log_file);
 
 // MPI CLOSE
+
+	timeEnd = MPI_Wtime();
+	MPI_Print(my_rank, "Execution Time: %f seconds", timeEnd-timeStart);
 	
 	MPI_Finalize(); 	
 	exit(EXIT_SUCCESS);
