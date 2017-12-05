@@ -2,6 +2,17 @@
 #include <stdarg.h>
 
 void MPI_Print(int rank, const char * format, ...) {
+
+	printf("RANK %02d - ", rank);
+	va_list args;
+	va_start(args, format);
+	vprintf(format, args);
+	va_end(args);
+	printf("\n");
+
+}
+
+void MPI_PrintIndented(int rank, const char * format, ...) {
 	
 	for(int i=0; i<rank; i++)
 		printf("\t");
