@@ -16,13 +16,13 @@ int CounterContainer_calculateSendPackSize(CounterContainer * entriesContainer) 
     MPI_Pack_size(entriesContainer->size, MPI_UNSIGNED_LONG, MPI_COMM_WORLD, &toAddPackSize);
     sendPackSize += toAddPackSize;
     
-    MPI_Pack_size(entriesContainer->size, MPI_INT, MPI_COMM_WORLD, &toAddPackSize);
-    sendPackSize += toAddPackSize;
-    
     for(int i=0; i<entriesContainer->size; i++) {
         MPI_Pack_size(entriesContainer->entries[i]->length, MPI_CHAR, MPI_COMM_WORLD, &toAddPackSize);
         sendPackSize += toAddPackSize;
     }
+
+    MPI_Pack_size(entriesContainer->size, MPI_INT, MPI_COMM_WORLD, &toAddPackSize);
+    sendPackSize += toAddPackSize;
 
     return sendPackSize;
 
