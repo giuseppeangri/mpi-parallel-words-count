@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 
 #include <file_information.h>
@@ -7,7 +8,10 @@ FileInformation * FileInformation_constructor(char * path) {
 
 	FileInformation * fileInformation = (FileInformation *) malloc(sizeof(FileInformation));
 
-	fileInformation->path = path;
+	fileInformation->pathLength = strlen(path)+1;
+
+    fileInformation->path = malloc(fileInformation->pathLength * sizeof(char));
+    strcpy(fileInformation->path, path);
 
 	struct stat buffer;
 	int status = stat(path, &buffer);

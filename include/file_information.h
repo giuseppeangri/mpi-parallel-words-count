@@ -1,5 +1,6 @@
 typedef struct FileInformation {
 
+	size_t pathLength;
 	char * path;
 	double size;
 

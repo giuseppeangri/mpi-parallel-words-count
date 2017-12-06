@@ -57,7 +57,7 @@ int main(int argc, char * argv[]) {
 		fprintf(log_file, "Total size of files: %.2f bytes\n", filesContainer.total_size);
 		fprintf(log_file, "Single split size: %f bytes\n\n", split_size);
 	}
-
+	
 	// Words Count Process
 
 	CounterContainer entriesContainer = CounterContainer_constructor();
