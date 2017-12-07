@@ -14,10 +14,6 @@ int FileInformationContainer_calculateSendPackSize(FileInformationContainer * fi
     MPI_Pack_size(1, MPI_INT, MPI_COMM_WORLD, &toAddPackSize);
     sendPackSize += toAddPackSize;
 
-    // FileInformationContainer.total_size
-    MPI_Pack_size(1, MPI_DOUBLE, MPI_COMM_WORLD, &toAddPackSize);
-    sendPackSize += toAddPackSize;
-
     // FileInformation.pathLength
     MPI_Pack_size(filesContainer->num_files, MPI_UNSIGNED_LONG, MPI_COMM_WORLD, &toAddPackSize);
     sendPackSize += toAddPackSize;
@@ -42,7 +38,6 @@ void * FileInformationContainer_makeSendPackBuffer(FileInformationContainer * fi
     int    position     = 0;
     
     MPI_Pack(&filesContainer->num_files, 1, MPI_INT, packedBuffer, sendPackSize, &position, MPI_COMM_WORLD); 
-    MPI_Pack(&filesContainer->total_size, 1, MPI_DOUBLE, packedBuffer, sendPackSize, &position, MPI_COMM_WORLD); 
 
     for(int i=0; i<filesContainer->num_files; i++) {
         MPI_Pack(&filesContainer->files[i]->pathLength, 1, MPI_UNSIGNED_LONG, packedBuffer, sendPackSize, &position, MPI_COMM_WORLD);            
@@ -51,5 +46,29 @@ void * FileInformationContainer_makeSendPackBuffer(FileInformationContainer * fi
     }
 
     return packedBuffer;
+
+}
+
+void FileInformationContainer_unpack(FileInformationContainer * filesContainer, void * recvBuffer, int recvBufferSize) {
+
+    int numFiles = 0;
+    int position = 0;
+
+    MPI_Unpack(recvBuffer, recvBufferSize, &position, &numFiles, 1, MPI_INT, MPI_COMM_WORLD);
+
+    for(int i=0; i<numFiles; i++) {
+
+        FileInformation * fileInformation = (FileInformation *) malloc(sizeof(FileInformation));
+
+        MPI_Unpack(recvBuffer, recvBufferSize, &position, &fileInformation->pathLength, 1, MPI_UNSIGNED_LONG, MPI_COMM_WORLD);
+
+        fileInformation->path = malloc(fileInformation->pathLength * sizeof(char));
+        MPI_Unpack(recvBuffer, recvBufferSize, &position, fileInformation->path, fileInformation->pathLength, MPI_CHAR, MPI_COMM_WORLD);
+
+        MPI_Unpack(recvBuffer, recvBufferSize, &position, &fileInformation->size, 1, MPI_DOUBLE, MPI_COMM_WORLD);
+        
+        FileInformationContainer_add(filesContainer, fileInformation);
+
+    }
 
 }
