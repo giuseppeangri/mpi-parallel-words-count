@@ -7,6 +7,7 @@
 
 #include <file_information.h>
 #include <file_information_container.h>
+#include <file_information_container_mpi.h>
 
 #include <counter.h>
 #include <counter_container.h>
@@ -47,7 +48,34 @@ int main(int argc, char * argv[]) {
 	(my_rank == master_rank) ? printf("Rank %d (MASTER)\n\n", my_rank) : printf("Rank %d\n\n", my_rank);
 
 	// Get information about all files to read
-	FileInformationContainer filesContainer = FileInformationContainer_buildByMasterFile(argv[1] ? argv[1] : "../data/00_master.txt");
+
+	FileInformationContainer filesContainer;
+	int filesContainerPackSize = 0;
+
+	if(my_rank == master_rank) {
+		filesContainer = FileInformationContainer_buildByMasterFile(argv[1] ? argv[1] : "../data/00_master.txt");
+		filesContainerPackSize = FileInformationContainer_calculateSendPackSize(&filesContainer);
+	}
+	else {
+		filesContainer = FileInformationContainer_constructor();
+	}
+
+	MPI_Bcast(&filesContainerPackSize, 1, MPI_INT, master_rank, MPI_COMM_WORLD);
+
+	void * filesContainerBuffer = NULL;
+	
+	if(my_rank == master_rank) {
+		filesContainerBuffer = FileInformationContainer_makeSendPackBuffer(&filesContainer, filesContainerPackSize);
+	}
+	else {
+		filesContainerBuffer = malloc(filesContainerPackSize);
+	}
+
+	MPI_Bcast(filesContainerBuffer, filesContainerPackSize, MPI_PACKED, master_rank, MPI_COMM_WORLD);
+
+	if(my_rank != master_rank) {
+		FileInformationContainer_unpack(&filesContainer, filesContainerBuffer, filesContainerPackSize);
+	}
 
 	// Calculate split size that each process will have to read
 	double split_size = (int) (filesContainer.total_size / num_processes);
