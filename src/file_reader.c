@@ -77,7 +77,7 @@ void checkStartingPoint(int my_rank, double split_size, FileInformationContainer
 
 void resetWordBuffer(char * word, int * word_index) {
 	// Clear current word and reset current word index
-	memset(&word[0], 0, strlen(word));
+	memset(&word[0], 0, 100*sizeof(char));
 	*word_index = 0;
 }
 
