@@ -1,5 +1,7 @@
 /data/*
 !/data/README
+!/data/00_master.txt
+!/data/05.txt
 
 /logs/*
 !/logs/README
