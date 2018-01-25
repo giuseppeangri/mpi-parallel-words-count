@@ -1,6 +1,9 @@
 # Ignore all
 *
 
+# Unignore obj directory
+!/obj/README
+
 # Unignore all with extensions
 !*.*
 
