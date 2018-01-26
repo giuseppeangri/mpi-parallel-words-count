@@ -137,8 +137,10 @@ void startReader(int my_rank, double split_size, FileInformationContainer * file
 			file_to_read_index++;
 
 			// Check if all files was readed
-			if(file_to_read_index >= filesContainer->num_files)
+			if(file_to_read_index >= filesContainer->num_files) {
+				file_to_read = NULL;
 				break;
+			}
 
 			// MPI_Print_To_File(log_file, my_rank, "Skip to file: %d", file_to_read_index);
 
@@ -175,26 +177,28 @@ void startReader(int my_rank, double split_size, FileInformationContainer * file
     }
 
     // MPI_Print(my_rank, "end %c", current_char);
+	
+	if(file_to_read != NULL) {
 
-    
+		current_char = fgetc(file_to_read);
 
-    current_char = fgetc(file_to_read);
+		// MPI_Print(my_rank, "next end %c", current_char);
 
-    // MPI_Print(my_rank, "next end %c", current_char);
+		if( (!isalnum(current_char)) ) {
 
-    if( (!isalnum(current_char)) ) {
+			if(current_word_index > 0) {
 
-    	if(current_word_index > 0) {
+				// In this case i read a space
+				// So i read a whole word
 
-	    	// In this case i read a space
-			// So i read a whole word
+				// MPI_Print_To_File(log_file, my_rank, "Final Word readed: %s", current_word);
+				addWordToContainer(entriesContainer, &words_found, current_word, &current_word_index);
 
-			// MPI_Print_To_File(log_file, my_rank, "Final Word readed: %s", current_word);
-			addWordToContainer(entriesContainer, &words_found, current_word, &current_word_index);
+			}
 
 		}
 
-    }
+	}
 
 	fprintf(log_file, "Size Readed: %f bytes\n", already_read_by_me);
     // MPI_Print(my_rank, "I read this size: %f", already_read_by_me);
