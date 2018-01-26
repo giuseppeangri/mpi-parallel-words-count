@@ -109,6 +109,9 @@ int main(int argc, char * argv[]) {
     if(my_rank == master_rank) {
         CounterContainer_merge(&entriesContainer, recvBuffer, recvBufferSize, num_processes-1);
 
+		timeEnd = MPI_Wtime();
+		MPI_Print(my_rank, "Execution Time: %f seconds", timeEnd-timeStart);
+
 		fprintf(log_file, "\nGlobal Histogram\n\n");
 		CounterContainer_printToFile(&entriesContainer, log_file);
 
@@ -119,9 +122,6 @@ int main(int argc, char * argv[]) {
     fclose(log_file);
 
 // MPI CLOSE
-
-	timeEnd = MPI_Wtime();
-	MPI_Print(my_rank, "Execution Time: %f seconds", timeEnd-timeStart);
 	
 	MPI_Finalize(); 	
 	exit(EXIT_SUCCESS);
