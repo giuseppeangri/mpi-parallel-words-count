@@ -111,6 +111,7 @@ int main(int argc, char * argv[]) {
 
 		timeEnd = MPI_Wtime();
 		MPI_Print(my_rank, "Execution Time: %f seconds", timeEnd-timeStart);
+		fprintf(log_file, "\nExecution Time: %f seconds\n", timeEnd-timeStart);
 
 		fprintf(log_file, "\nGlobal Histogram\n\n");
 		CounterContainer_printToFile(&entriesContainer, log_file);
