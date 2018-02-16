@@ -20,6 +20,9 @@ void checkStartingPoint(int my_rank, double split_size, FileInformationContainer
 	// Calculate the size already read by previous processes
     already_read_by_others = my_rank * split_size;
 
+	if(my_rank > 1) {
+		already_read_by_others += my_rank-1;
+	}
     // Calculate the file to read and the remaining part of size already read by previous processes
     *file_to_read_index = 0;
 	
@@ -28,7 +31,7 @@ void checkStartingPoint(int my_rank, double split_size, FileInformationContainer
     	(*file_to_read_index)++;
     }
 
-    already_read_by_others += my_rank-1;
+	// MPI_PrintIndented(my_rank, "file_to_read_index %d", *file_to_read_index);
 
 	// Open the first file that my process must read
     *file_to_read = openFile(filesContainer->files[*file_to_read_index]->path, "r");
@@ -46,7 +49,7 @@ void checkStartingPoint(int my_rank, double split_size, FileInformationContainer
 
 		// MPI_Print(my_rank, "file %d", file_to_read_index);
 		// MPI_Print(my_rank, "already_read_by_others %f", already_read_by_others);
-		// MPI_Print(my_rank, "start %c", current_char);
+		// MPI_PrintIndented(my_rank, "start %c", current_char);
 
 		if(isalnum(current_char)) {
 
@@ -176,13 +179,13 @@ void startReader(int my_rank, double split_size, FileInformationContainer * file
 
     }
 
-    // MPI_Print(my_rank, "end %c", current_char);
+    // MPI_PrintIndented(my_rank, "end %c", current_char);
 	
 	if(file_to_read != NULL) {
 
 		current_char = fgetc(file_to_read);
 
-		// MPI_Print(my_rank, "next end %c", current_char);
+		// MPI_PrintIndented(my_rank, "next end %c", current_char);
 
 		if( (!isalnum(current_char)) ) {
 
