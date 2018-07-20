@@ -1,5 +1,3 @@
-
-
 # MPI Parallel Words Count
 
 Academic Project submitted by [**Giuseppe Angri**](https://github.com/giuseppeangri)
@@ -187,5 +185,3 @@ Inside the ***src*** directory run the following command:
    Is the path of the file that contains the paths of all files to be read and counted.
 
    If omitted, it will be used the file: ***"data/00_master.txt"*** 
-
-
