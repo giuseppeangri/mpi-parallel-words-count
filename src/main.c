@@ -41,10 +41,10 @@ int main(int argc, char * argv[]) {
 	log_file = openFile(log_file_name, "w");
 
 	// Welcome message
-	fprintf(log_file, "MPI Words Count Collective - Giuseppe Angri\n");
+	fprintf(log_file, "MPI Parallel Words Count - Giuseppe Angri\n");
 	(my_rank == master_rank) ? fprintf(log_file, "Rank %d (MASTER)\n\n", my_rank) : fprintf(log_file, "Rank %d\n\n", my_rank);
 
-	printf("MPI Words Count Collective - Giuseppe Angri\n");
+	printf("MPI Parallel Words Count - Giuseppe Angri\n");
 	(my_rank == master_rank) ? printf("Rank %d (MASTER)\n\n", my_rank) : printf("Rank %d\n\n", my_rank);
 
 	// Get information about all files to read
