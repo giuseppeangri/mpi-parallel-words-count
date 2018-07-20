@@ -2,13 +2,13 @@
 
 # MPI Parallel Words Count
 
-Academic Project submitted by **Giuseppe Angri**
+Academic Project submitted by [**Giuseppe Angri**](https://github.com/giuseppeangri)
 
-Course: **Parallel, Concurrent, and on the Cloud Programming**
+Master Degree Course: **Parallel and Concurrent Programming and on the Cloud**
 
-Teacher: **Vittorio Scarano** 
+Teacher: **Vittorio Scarano**
 
-Computer Science Department - University of Salerno (Italy)
+[Computer Science Department](http://www.di.unisa.it) - [University of Salerno](https://www.unisa.it/) (Italy)
 
 ## Problem statement
 
